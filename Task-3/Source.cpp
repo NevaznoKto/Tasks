@@ -4,7 +4,7 @@
 #include <dirent.h>
 
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/stitching.hpp>
 
 using std::vector;
 using std::string;
@@ -36,30 +36,26 @@ void scan_dir(const char* name_dir, vector<Mat> &files)
 int main()
 {
 	vector<Mat> images;
-	char* Name_DIR = "../detective";
+	char* Name_DIR = "../treasure_map";
 	scan_dir(Name_DIR, images);
-	
-	Mat dst_out; int k = 0;
-	for (int i = 0; i < images.size(); ++i)
+
+
+	cv::Stitcher::Mode mode = cv::Stitcher::SCANS;
+
+	Mat pano;
+	cv::Ptr<cv::Stitcher> stitcher = cv::Stitcher::create(mode);
+	cv::Stitcher::Status status = stitcher->stitch(images, pano);
+	if (status != cv::Stitcher::OK)
 	{
-		for (int j = i + 1; j < images.size(); ++j)
-		{
-				++k;
-				dst_out = images[i] ^ images[j];
-
-				string name("dst_");
-				string s = std::to_string(i);
-				name += s;
-				s = std::to_string(j);
-				name += s;
-
-				//cv::imshow(name, dst_out);
-				name += ".jpg";
-				cv::imwrite(name, dst_out);
-		}
+		std::cout << "Can't stitch images, error code = " << int(status) << std::endl;
+		return EXIT_FAILURE;
 	}
-
 	images.clear();
+
+	string result_name = "result.jpg";
+	imwrite(result_name, pano);
+	std::cout << "stitching completed successfully, " << result_name << " saved!" << std::endl;
+
 	cv::waitKey(0);
 	cv::destroyAllWindows();
 	return 0;
