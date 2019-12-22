@@ -91,6 +91,9 @@ int main()
 		}
 	}
 
+	cap.release();
+	net.~Net();
+
 	cv::waitKey(0);
 	cv::destroyAllWindows();
 	return 0;
