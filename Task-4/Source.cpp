@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
-#include <dirent.h>
 
 #include <opencv2/highgui.hpp>
 #include <opencv2/dnn.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include "Scan.h"
 using std::string;
 using cv::Mat;
 using std::cout;
@@ -32,19 +32,14 @@ string toHMS(double mil)
 int main()
 {
 	DIR * dir_p;
-	struct dirent * entry;
-	char* Name_DIR = "../endless_story";
-	dir_p = opendir(Name_DIR);
-
-	wchar_t* txt = dir_p->wdirp->patt;
-	std::wstring ws(txt);
-	string direct(ws.begin(), ws.end() - 1);
+	dir_p = opendir("../endless_story");
+	string direct = FullPathDirectory(dir_p);
 
 	string model = direct + "MobileNetSSD_deploy.caffemodel";
 	string config = direct + "MobileNetSSD_deploy.prototxt";
 
 	cv::dnn::Net net = cv::dnn::readNet(model, config);
-	cv::VideoCapture cap = cv::VideoCapture(direct + "video.mp4");
+	cv::VideoCapture cap = cv::VideoCapture(direct + "video_Trim.mp4");
 
 	bool flag = true;
 	double delta = 50 * cap.get(cv::CAP_PROP_FPS);
