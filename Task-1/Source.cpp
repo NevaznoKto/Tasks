@@ -7,16 +7,22 @@
 #include "Scan.h"
 using std::string;
 
-string decode(std::vector<cv::Mat> &files)
+string decode(DIR * dir_p)
 {
 	cv::QRCodeDetector qrDecoder = cv::QRCodeDetector::QRCodeDetector();
 
-	for(auto iter = files.begin(); iter != files.end(); ++iter)
+	cv::Mat image;
+	int err = 0;
+	while(err != -1)
 	{
-		string code = qrDecoder.detectAndDecode(*iter);
+		err = getOneFileInDir(dir_p, image);
+		if (err == 0) 
+		{
+			string code = qrDecoder.detectAndDecode(image);
 
-		if (code[0] > '9')
-			return code;
+			if (code[0] > '9')
+				return code;
+		}
 	}
 	return "No found";
 }
@@ -26,13 +32,12 @@ int main()
 	using std::cout;
 	using std::endl;
 
-	std::vector<cv::Mat> files;
 	char* Name_DIR = "../truth_search";
-	scan_dir(Name_DIR, files);
+	DIR * dir_p;
+	dir_p = opendir(Name_DIR);
 
-	cout << files.size() << endl;
+	cout << endl << endl << decode(dir_p) << endl << endl;
 
-	cout << endl << endl << decode(files) << endl << endl;
-
+	closedir(dir_p);
 	return 0;
 }

@@ -31,3 +31,21 @@ std::string FullPathDirectory(const DIR * dir_p)
 
 	return direct;
 }
+
+int getOneFileInDir(DIR *dir_p, cv::Mat &file)
+{
+	struct dirent * entry;
+	std::string direct = FullPathDirectory(dir_p);
+
+	if ((entry = readdir(dir_p)) != NULL)
+	{
+		if (entry->d_type == DT_REG)
+		{
+			std::string name(entry->d_name);
+			file = cv::imread(direct + name);
+			return 0;
+		}
+		else return -2;
+	}
+	else return -1;
+}
